@@ -7,10 +7,25 @@ import MyWysiwygEditor from '../../myWysiwygEditor';
 
 function CreateCourseModal({ show, handleClose, saveCourse, teachers }) {
 
-    const [editorContent, setEditorContent] = useState('');
+    //для требований
+    const [editorRequirements, setEditorRequirements] = useState('');
 
-    const handleContentChange = (newContent) => {
-        setEditorContent(newContent);
+    const handleRequirementsChange = (newRequirements) => {
+        setEditorRequirements(newRequirements);
+    };
+
+    //для аннотаций
+    const [editorAnnotations, setEditorAnnotations] = useState('');
+
+    const handleAnnotationsChange = (newAnnotations) => {
+        setEditorAnnotations(newAnnotations);
+    };
+
+
+    const [selectedSemester, setSelectedSemester] = useState(""); // Состояние для хранения выбранного статуса 
+
+    const handleRadioChange = (e) => {
+        setSelectedSemester(e.target.value); // Обновляем состояние при изменении выбора
     };
     return (
         <Modal show={show} onHide={handleClose} size="lg">
@@ -40,21 +55,35 @@ function CreateCourseModal({ show, handleClose, saveCourse, teachers }) {
                     <Form.Group className="mb-3" controlId="semester1">
                         <Form.Label>Семестр</Form.Label>
                         <div style={{ display: "flex", alignItems: "center" }}>
-                            <Form.Check type="radio" label="Осенний" />
-                            <span style={{ marginLeft: "10px" }}>
-                                <Form.Check type="radio" label="Весенний" />
-                            </span>
+                            <Form.Check
+                                inline
+                                label="Осенний"
+                                name="group1"
+                                type='radio'
+                                id={`autumnStatus`}
+                                value="Autumn" // Значение для выбора
+                                onChange={handleRadioChange} // Обработчик изменения выбора
+                            />
+                            <Form.Check
+                                inline
+                                label="Весенний"
+                                name="group1"
+                                type='radio'
+                                id={`springStatus`}
+                                value="Spring" // Значение для выбора
+                                onChange={handleRadioChange} // Обработчик изменения выбора
+                            />
                         </div>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="requirements1">
                         <Form.Label>Требования</Form.Label>
-                        <MyWysiwygEditor onContentChange={handleContentChange} />
-                        <p>{editorContent}</p>
+                        <MyWysiwygEditor onContentChange={handleRequirementsChange} />
+                        {/* <p>{editorContent}</p> */}
                     </Form.Group>
-                    {/* <Form.Group className="mb-3" controlId="annotations1">
+                    <Form.Group className="mb-3" controlId="annotations1">
                         <Form.Label>Аннотации</Form.Label>
-                        <MyWysiwygEditor />
-                    </Form.Group> */}
+                        <MyWysiwygEditor onContentChange={handleAnnotationsChange} />
+                    </Form.Group>
                     <Form.Group className="mb-3" controlId="mainTeacherId1">
                         <Form.Label>Основной преподаватель курса</Form.Label>
                         <Form.Select aria-label="Default select example">
@@ -70,7 +99,7 @@ function CreateCourseModal({ show, handleClose, saveCourse, teachers }) {
                 <Button variant="secondary" onClick={handleClose}>
                     Отмена
                 </Button>
-                <Button variant="primary" onClick={saveCourse}>
+                <Button variant="primary" onClick={() => saveCourse(selectedSemester, editorRequirements, editorAnnotations)}>
                     Сохранить
                 </Button>
             </Modal.Footer>

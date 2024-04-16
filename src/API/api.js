@@ -1,4 +1,4 @@
-import { courseDetailsActionCreator, editStatusActionCreator, myCourseActionCreator, teachingCourseActionCreator } from "../reducers/course-reducer";
+import { courseDetailsActionCreator, createNoteActionCreator, editStatusActionCreator, myCourseActionCreator, teachingCourseActionCreator } from "../reducers/course-reducer";
 import { listOfGroupCoursesActionCreator, listOfGroupsActionCreator } from "../reducers/group-reducer";
 import { loginActionCreator, logoutActionCreator, profileActionCreator, roleActionCreator, teachersActionCreator } from "../reducers/user-reducer";
 
@@ -332,11 +332,151 @@ const signUpForCourse = (id, body) => {
     }).catch(error => console.log(error))
 }
 
+const createCourse = (id, body) => {
+    return dispatch => fetch(`https://camp-courses.api.kreosoft.space/groups/${id}`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify(body)
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Не удалось создать курс')
+        }
+        return response.json();
+    }).then(data => {
+        console.log("успешно создан курс");
+        //dispatch(editStatusActionCreator(body.status));
+    }).catch(error => console.log(error))
+}
+
+const editCourse = (id, body) => {
+    return dispatch => fetch(`https://camp-courses.api.kreosoft.space/courses/${id}`, {
+        method: "PUT",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify(body)
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Не удалось редактировать курс')
+        }
+        return response.json();
+    }).then(data => {
+        console.log("успешно редактирован курс");
+        //dispatch(editStatusActionCreator(body.status));
+    }).catch(error => console.log(error))
+}
+
+const editRequirementsAndAnnotations = (id, body) => {
+    return dispatch => fetch(`https://camp-courses.api.kreosoft.space/courses/${id}/requirements-and-annotations`, {
+        method: "PUT",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify(body)
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Не удалось редактировать курс(требования  аннотацию)')
+        }
+        return response.json();
+    }).then(data => {
+        console.log("успешно редактирован курс(требования и аннотация)");
+        //dispatch(editStatusActionCreator(body.status));
+    }).catch(error => console.log(error))
+}
+
+const createNote = (id, body) => {
+    return dispatch => fetch(`https://camp-courses.api.kreosoft.space/courses/${id}/notifications`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify(body)
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Не удалось создать уведомление')
+        }
+        return response.json();
+    }).then(data => {
+        console.log("успешно создано уведомление");
+        dispatch(createNoteActionCreator(body));
+    }).catch(error => console.log(error))
+}
+
+const addTeacher = (id, body) => {
+    return dispatch => fetch(`https://camp-courses.api.kreosoft.space/courses/${id}/teachers`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify(body)
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Не удалось добавить учителя')
+        }
+        return response.json();
+    }).then(data => {
+        console.log("успешно добавлен учитель");
+        //dispatch(createNoteActionCreator(body));
+    }).catch(error => console.log(error))
+}
+
+const editStudentStatus = (id, studentId, body) => {
+    return dispatch => fetch(`https://camp-courses.api.kreosoft.space/courses/${id}/student-status/${studentId}`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify(body)
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Не удалось изменить статус ученика')
+        }
+        return response.json();
+    }).then(data => {
+        console.log("успешно изменен статус ученика");
+        dispatch(courseDetailsActionCreator(data));
+    }).catch(error => console.log(error))
+}
+
+const editMark = (id, studentId, body) => {
+    return dispatch => fetch(`https://camp-courses.api.kreosoft.space/courses/${id}/marks/${studentId}`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify(body)
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Не удалось изменить отметка ученика')
+        }
+        return response.json();
+    }).then(data => {
+        console.log("успешно изменена отметка ученика");
+        dispatch(courseDetailsActionCreator(data));
+    }).catch(error => console.log(error))
+}
+
 export const courseAPI = {
     listOfMyCourses: listOfMyCourses,
     listOfTeachingCourses: listOfTeachingCourses,
     courseDetails: courseDetails,
     editStatus: editStatus,
-    signUpForCourse: signUpForCourse
+    signUpForCourse: signUpForCourse,
+    createCourse: createCourse,
+    editCourse: editCourse,
+    editRequirementsAndAnnotations: editRequirementsAndAnnotations,
+    createNote: createNote,
+    addTeacher: addTeacher,
+    editStudentStatus: editStudentStatus,
+    editMark: editMark
 }
 

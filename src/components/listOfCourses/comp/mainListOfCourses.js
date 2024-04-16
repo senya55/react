@@ -3,9 +3,10 @@ import CourseCard from "./courseCard/courseCard";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useParams } from 'react-router-dom';
-import { groupAPI, userAPI } from "../../../API/api";
+import { courseAPI, groupAPI, userAPI } from "../../../API/api";
 import { useDispatch, useSelector } from "react-redux";
 import CreateCourseModal from "./createCourse";
+import { wait } from "@testing-library/user-event/dist/utils";
 
 const MainListOfCourses = () => {
 
@@ -22,18 +23,29 @@ const MainListOfCourses = () => {
 
 
     //при сохранении курса(создании)
-    const saveCourse = async () => {
-        await createCourse();
+    const saveCourse = async (selectedSemester, editorRequirements, editorAnnotations) => {
+        await createCourse(selectedSemester, editorRequirements, editorAnnotations);
         setShow(false);
         // Вызываем функцию при открытии модального окна
     };
 
-    const createCourse = async () => {
+    const createCourse = async (selectedSemester, editorRequirements, editorAnnotations) => {
         const name = document.getElementById('courseName1').value;
         const startYear = document.getElementById('startYear1').value;
-        //const test = document.getElementById('requirements1').value;
-
-        console.log("данные: ", name, startYear)
+        const maximumStudentsCount = document.getElementById('maximumStudentsCount1').value;
+        const mainTeacherId = document.getElementById('mainTeacherId1').value;
+        const requestBody = {
+            "name": name,
+            "startYear": startYear,
+            "maximumStudentsCount": maximumStudentsCount,
+            "semester": selectedSemester,
+            "requirements": editorRequirements,
+            "annotations": editorAnnotations,
+            "mainTeacherId": mainTeacherId
+        };
+        await dispatch(courseAPI.createCourse(id, requestBody));
+        dispatch(groupAPI.listOfGroupCourses(id, nameOfGroup));
+        //console.log("данные: ", requestBody)
 
     };
 
@@ -41,14 +53,16 @@ const MainListOfCourses = () => {
 
     //заменить потом на норм ид
     const { id } = useParams();
-    // useEffect(() => {
-    //     //dispatch(groupAPI.listOfGroupCourses(id, nameOfGroup));
 
-    // }, []);
 
     const courses = useSelector(state => state.groupReducer.specificGroup.listOfGroupCourses);
     const nameOfGroup = useSelector(state => state.groupReducer.specificGroup.nameOfGroup);
     const isAdmin = useSelector(state => state.userReduser.role.isAdmin);
+    console.log("NAME OF GROUP ", nameOfGroup);
+    // useEffect(() => {
+    //     dispatch(groupAPI.listOfGroupCourses(id, nameOfGroup));
+
+    // }, []);
 
 
     return (

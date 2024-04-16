@@ -3,9 +3,17 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Nav from 'react-bootstrap/Nav';
 import { useDispatch, useSelector } from "react-redux";
+import CreateNoteModal from './modals/createNote';
+import { useParams } from 'react-router-dom';
+import { courseAPI } from '../../../API/api';
+import Note from './note';
+import Badge from 'react-bootstrap/Badge';
 
 function SecondBlock() {
-    const [selectedTab, setSelectedTab] = useState('#first'); // Состояние для отслеживания выбранной вкладки
+    const dispatch = useDispatch();
+    const { id } = useParams();
+
+    const [selectedTab, setSelectedTab] = useState('#requirements'); // Состояние для отслеживания выбранной вкладки
 
     const handleTabSelect = (tab) => {
         setSelectedTab(tab);
@@ -13,6 +21,33 @@ function SecondBlock() {
 
     const requirements = useSelector(state => state.courseReducer.courseDetails.requirements);
     const annotations = useSelector(state => state.courseReducer.courseDetails.annotations);
+    const notifications = useSelector(state => state.courseReducer.courseDetails.notifications);
+    console.log("кол-во ув-й ", notifications.length)
+
+    const isAdmin = useSelector(state => state.userReduser.role.isAdmin);
+
+    const myEmail = useSelector(state => state.userReduser.profile.email);
+    const teachersOfThisCourse = useSelector(state => state.courseReducer.courseDetails.teachers);
+    const isTeacherOfThisCourse = teachersOfThisCourse.find((men) => men.email === myEmail);
+    console.log("Я учитель? ", isTeacherOfThisCourse);
+
+    //для модального окна создания уведомления
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const handleCreateNote = (isImportant) => {
+        //
+        const note = document.getElementById('createNote1').value;
+        //const isImportant = document.getElementById('isImportant1').value;
+        //console.log("isImportant ", isImportant);
+        const requestBody = {
+            "text": note,
+            "isImportant": isImportant
+        };
+        dispatch(courseAPI.createNote(id, requestBody));
+        console.log("note ", note);
+        setShow(false);
+    };
 
     return (
         <div className="mt-4">
@@ -43,25 +78,31 @@ function SecondBlock() {
                                 style={{ color: 'black', fontWeight: selectedTab === '#notifications' ? 'bold' : 'normal' }}
                                 onClick={() => handleTabSelect('#notifications')}
                             >
-                                Уведомления
+                                Уведомления <Badge pill bg="danger">{notifications.length}</Badge>
                             </Nav.Link>
                         </Nav.Item>
                     </Nav>
                 </Card.Header>
                 <Card.Body>
                     {selectedTab === '#requirements' && (
-                        <Card.Text>
-                            {requirements}
-                        </Card.Text>
+                        //dangerouslySetInnerHTML используется чтобы рендерить HTML содержимое без экранирования(тегов)
+                        //представляет угрозу безопасности 0_0
+                        <Card.Text dangerouslySetInnerHTML={{ __html: requirements }} />
                     )}
                     {selectedTab === '#annotations' && (
-                        <Card.Text>
-                            {annotations}
-                        </Card.Text>
+                        <Card.Text dangerouslySetInnerHTML={{ __html: annotations }} />
                     )}
                     {selectedTab === '#notifications' && (
                         <Card.Text>
-                            Текущие уведомления
+                            {(isAdmin || isTeacherOfThisCourse) && (
+                                <div>
+                                    <Button variant="primary" onClick={handleShow}>СОЗДАТЬ УВЕДОМЛЕНИЕ</Button>
+                                </div>
+                            )}
+                            <CreateNoteModal show={show} handleClose={handleClose} handleCreateNote={handleCreateNote} />
+                            {notifications.map((notification, index) => (
+                                <Note key={index} text={notification.text} isImportant={notification.isImportant} />
+                            ))}
                         </Card.Text>
                     )}
                 </Card.Body>

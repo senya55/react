@@ -2,6 +2,7 @@ const MY_COURSES = "MY_COURSES";
 const TEACHING_COURSES = "TEACHING_COURSES";
 const COURSE_DETAILS = "COURSE_DETAILS";
 const EDIT_STATUS = "EDIT_STATUS";
+const CREATE_NOTE = "CREATE_NOTE";
 //const SIGN_UP_FOR_COURSE = "SIGN_UP_FOR_COURSE";
 
 const initialCourseState = {
@@ -17,7 +18,10 @@ const initialCourseState = {
         studentsInQueueCount: 0,
         requirements: "",
         annotations: "",
-        //studentsInQueueCount: 0
+        mainTeacherId: "",
+        notifications: [],
+        teachers: [],
+        students: []
 
     }
 }
@@ -33,8 +37,6 @@ const courseReducer = (state = initialCourseState, action) => {
             newState.listOfTeachingCourses = action.teachingCourses;
             return newState;
         case COURSE_DETAILS:
-            //console.log("rrrrrrr", action)
-            //newState.listOfTeachingCourses = action.teachingCourses;
             newState.courseDetails.name = action.info.name;
             newState.courseDetails.status = action.info.status;
             newState.courseDetails.semester = action.info.semester;
@@ -44,15 +46,18 @@ const courseReducer = (state = initialCourseState, action) => {
             newState.courseDetails.studentsInQueueCount = action.info.studentsInQueueCount;
             newState.courseDetails.requirements = action.info.requirements;
             newState.courseDetails.annotations = action.info.annotations;
+            newState.courseDetails.notifications = action.info.notifications;
+            newState.courseDetails.teachers = action.info.teachers;
+            newState.courseDetails.students = action.info.students;
             return newState;
         case EDIT_STATUS:
             //console.log("rrrrrrr", action)
             newState.courseDetails.status = action.status;
             return newState;
-        // case SIGN_UP_FOR_COURSE:
-        //     //console.log("rrrrrrr", action)
-        //     //newState.courseDetails.status = action.status;
-        //     return newState;
+        case CREATE_NOTE:
+            //console.log("rrrrrrr", action)
+            newState.courseDetails.notifications = [...newState.courseDetails.notifications, action.note];
+            return newState;
 
         default:
             return newState;
@@ -75,6 +80,10 @@ export function courseDetailsActionCreator(info) {
 
 export function editStatusActionCreator(status) {
     return { type: EDIT_STATUS, status: status };
+}
+
+export function createNoteActionCreator(note) {
+    return { type: CREATE_NOTE, note: note };
 }
 
 
