@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Alert from 'react-bootstrap/Alert';
 
 function Note(props) {
 
@@ -13,9 +12,6 @@ function Note(props) {
             ) : (
                 <div>{text}</div>
             )}
-
-
-
         </div >
     );
 

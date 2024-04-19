@@ -5,6 +5,7 @@ import Nav from 'react-bootstrap/Nav';
 import EditGroupModal from '../editGroup';
 import { useDispatch, useSelector } from "react-redux";
 import { groupAPI } from '../../../../API/api';
+import ConfirmationWindowModal from '../../../confirmationWindow';
 
 function GroupCard(props) {
     const dispatch = useDispatch();
@@ -26,6 +27,16 @@ function GroupCard(props) {
         setShow(false);
     };
 
+    //для модального окна подтверждения удаления
+    const [showConfirm, setShowConfirm] = useState(false);
+    const handleCloseConfirm = () => setShowConfirm(false);
+    const handleShowConfirm = () => setShowConfirm(true);
+
+    const handleConfirm = () => {
+        deleteGroup();
+        setShowConfirm(false);
+    };
+
     const deleteGroup = () => {
         dispatch(groupAPI.deleteGroup(id));
     };
@@ -35,9 +46,11 @@ function GroupCard(props) {
             {isAdmin && (
                 <div>
                     <Button variant="warning" onClick={handleShow}>Редактировать</Button>
-                    <Button variant="danger" className="ms-1" onClick={deleteGroup}>Удалить</Button>
+                    <Button variant="danger" className="ms-1" onClick={handleShowConfirm}>Удалить</Button>
                 </div>
             )}
+
+            <ConfirmationWindowModal showConfirm={showConfirm} handleCloseConfirm={handleCloseConfirm} handleConfirm={handleConfirm} groupOrCourse={"группу " + name} />
 
             <EditGroupModal show={show} handleClose={handleClose} handleEditGroup={handleEditGroup} name={name} />
 

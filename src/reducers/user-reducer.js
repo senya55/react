@@ -3,6 +3,7 @@ const PROFILE = "PROFILE";
 const LOGOUT = "LOGOUT";
 const ROLE = "ROLE";
 const TEACHERS = "TEACHERS";
+
 const initialUserState = {
     isAuth: 0,
     profile: {
@@ -38,7 +39,6 @@ const userReducer = (state = initialUserState, action) => {
             return newState;
         default:
             return newState;
-
     }
 }
 

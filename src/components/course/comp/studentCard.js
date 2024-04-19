@@ -71,6 +71,7 @@ function StudentCard(props) {
             break;
     }
 
+
     const dispatch = useDispatch();
     const { id } = useParams();
 
@@ -89,6 +90,11 @@ function StudentCard(props) {
 
     }
 
+    let meOrNotMe = false;
+    if (email === myEmail) {
+        meOrNotMe = true;
+    }
+
     //для модального окна создания уведомления
     const [markType, setMarkType] = useState('');
     const [show, setShow] = useState(false);
@@ -96,7 +102,6 @@ function StudentCard(props) {
     const handleShow = async (type) => {
         setMarkType(type);
         setShow(true);
-        //await dispatch(userAPI.teachers());; // Вызываем функцию при открытии модального окна
     };
     const handleEditMark = async (selectedMark, markType) => {
         const requestBody = {
@@ -142,6 +147,19 @@ function StudentCard(props) {
                         </>
                     )}
 
+                    {(status === "Accepted" && meOrNotMe && !isAdmin) && (
+                        <>
+                            <Col>
+                                Промежуточная аттестация - <Badge bg={colorOfMidtermResult} >{midtermResultWord}</Badge>
+
+                            </Col>
+                            <Col>
+                                Финальная аттестация - <Badge bg={colorOfFinalResult}>{finalResultWord}</Badge>
+
+                            </Col>
+                        </>
+                    )}
+
                     <EditMarkModal show={show} handleClose={handleClose} handleEditMark={handleEditMark} markType={markType} nameOfStudent={name} />
 
                     {(status === "InQueue" && (isTeacherOfThisCourse || isAdmin)) && (
@@ -152,10 +170,7 @@ function StudentCard(props) {
                     )}
                 </Row>
 
-
             </div>
-
-
 
         </div >
     );

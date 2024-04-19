@@ -24,15 +24,69 @@ const MainListOfCourses = () => {
 
     //при сохранении курса(создании)
     const saveCourse = async (selectedSemester, editorRequirements, editorAnnotations) => {
-        await createCourse(selectedSemester, editorRequirements, editorAnnotations);
+        const name = document.getElementById('courseName1').value;
+        const startYear = document.getElementById('startYear1').value;
+        const maximumStudentsCount = document.getElementById('maximumStudentsCount1').value;
+
+        //эххх куча проверок, прописанных вручную. Вообще в бутстрапе есть валидация, но я по какой-то причине решила сама это все прописать
+        //проверка для названия курса
+        if (name === null || name === "") {
+            document.getElementById("courseNameHelp1").hidden = false;
+            return;
+        }
+        else {
+            document.getElementById("courseNameHelp1").hidden = true;
+        }
+
+        if (startYear === null || startYear === "" || startYear > 2029 || startYear < 2000) {
+            document.getElementById("startYearHelp1").hidden = false;
+            return;
+        }
+        else {
+            document.getElementById("startYearHelp1").hidden = true;
+        }
+
+        if (maximumStudentsCount === null || maximumStudentsCount === "" || maximumStudentsCount > 200) {
+            document.getElementById("maximumStudentsCountHelp1").hidden = false;
+            return;
+        }
+        else {
+            document.getElementById("maximumStudentsCountHelp1").hidden = true;
+        }
+
+        if (selectedSemester === null || selectedSemester === "") {
+            document.getElementById("semesterHelp1").hidden = false;
+            return;
+        }
+        else {
+            document.getElementById("semesterHelp1").hidden = true;
+        }
+
+        if (editorRequirements === null || editorRequirements === "") {
+            document.getElementById("requirementsHelp1").hidden = false;
+            return;
+        }
+        else {
+            document.getElementById("requirementsHelp1").hidden = true;
+        }
+
+        if (editorAnnotations === null || editorAnnotations === "") {
+            document.getElementById("annotationsHelp1").hidden = false;
+            return;
+        }
+        else {
+            document.getElementById("annotationsHelp1").hidden = true;
+        }
+
+        await createCourse(selectedSemester, editorRequirements, editorAnnotations, name, startYear, maximumStudentsCount);
         setShow(false);
         // Вызываем функцию при открытии модального окна
     };
 
-    const createCourse = async (selectedSemester, editorRequirements, editorAnnotations) => {
-        const name = document.getElementById('courseName1').value;
-        const startYear = document.getElementById('startYear1').value;
-        const maximumStudentsCount = document.getElementById('maximumStudentsCount1').value;
+    const createCourse = async (selectedSemester, editorRequirements, editorAnnotations, name, startYear, maximumStudentsCount) => {
+
+
+
         const mainTeacherId = document.getElementById('mainTeacherId1').value;
         const requestBody = {
             "name": name,
@@ -43,8 +97,11 @@ const MainListOfCourses = () => {
             "annotations": editorAnnotations,
             "mainTeacherId": mainTeacherId
         };
-        await dispatch(courseAPI.createCourse(id, requestBody));
-        dispatch(groupAPI.listOfGroupCourses(id, nameOfGroup));
+
+
+
+        dispatch(courseAPI.createCourse(id, requestBody));
+        //dispatch(groupAPI.listOfGroupCourses(id, nameOfGroup));
         //console.log("данные: ", requestBody)
 
     };

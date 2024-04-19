@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useDispatch, useSelector } from "react-redux";
@@ -26,11 +24,16 @@ function FirstBlock() {
     const isAdmin = useSelector(state => state.userReduser.role.isAdmin);
     const isTeacher = useSelector(state => state.userReduser.role.isTeacher);
 
+    //я учитель этого курса или нет
     const myEmail = useSelector(state => state.userReduser.profile.email);
     const teachersOfThisCourse = useSelector(state => state.courseReducer.courseDetails.teachers);
     const isTeacherOfThisCourse = teachersOfThisCourse.find((men) => men.email === myEmail);
     //const isTeacherOfThisCourse = 
     console.log("Я учитель? ", isTeacherOfThisCourse);
+
+    //я студент этого курса или нет
+    const studentsOfThisCourse = useSelector(state => state.courseReducer.courseDetails.students);
+    const isStudentOfThisCourse = studentsOfThisCourse.find((men) => men.email === myEmail);
 
 
     //для модального окна редактирования статуса
@@ -38,13 +41,12 @@ function FirstBlock() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const handleEditStatus = (selectedStatus) => {
-        //
-        //const status = document.getElementById('openForAssigningStatus').value;
+
         const requestBody = {
             "status": selectedStatus
         };
         dispatch(courseAPI.editStatus(requestBody, id));
-        //console.log("selectedStatus ", selectedStatus);
+
         setShow(false);
     };
 
@@ -53,11 +55,10 @@ function FirstBlock() {
     const handleCloseEditCourse = () => setShowEditCourse(false);
     const handleShowEditCourse = async () => {
         setShowEditCourse(true);
-        await dispatch(userAPI.teachers());; // Вызываем функцию при открытии модального окна
+        // Вызываем функцию при открытии модального окна
+        await dispatch(userAPI.teachers());;
     };
-    // const handleEditCourse = () => {
-    //     setShowEditCourse(false);
-    // };
+
     const handleEditCourse = async (selectedSemester, editorRequirements, editorAnnotations) => {
         await editCourse(selectedSemester, editorRequirements, editorAnnotations);
         setShowEditCourse(false);
@@ -70,7 +71,7 @@ function FirstBlock() {
             const name = document.getElementById('courseName2').value;
             const startYear = document.getElementById('startYear2').value;
             const maximumStudentsCount = document.getElementById('maximumStudentsCount2').value;
-            const mainTeacherId = document.getElementById('mainTeacherId2').value;
+
             const requestBody = {
                 "name": name,
                 "startYear": startYear,
@@ -78,11 +79,11 @@ function FirstBlock() {
                 "semester": selectedSemester,
                 "requirements": editorRequirements,
                 "annotations": editorAnnotations,
-                "mainTeacherId": mainTeacherId
+                "mainTeacherId": "776668a5-c65d-41da-12ce-08db2e8acafa"
             };
             console.log("данные: ", requestBody)
-            await dispatch(courseAPI.editCourse(id, requestBody));
-            dispatch(courseAPI.courseDetails(id));
+            dispatch(courseAPI.editCourse(id, requestBody));
+
         }
         else {
             console.log("user just");
@@ -91,16 +92,45 @@ function FirstBlock() {
                 "annotations": editorAnnotations
             };
             console.log("данные: ", requestBody);
-            await dispatch(courseAPI.editRequirementsAndAnnotations(id, requestBody));
-            dispatch(courseAPI.courseDetails(id));
+            dispatch(courseAPI.editRequirementsAndAnnotations(id, requestBody));
+
         }
 
     };
     const teachers = useSelector(state => state.userReduser.allUsers);
 
     const sighUpForCourse = async () => {
-        await dispatch(courseAPI.signUpForCourse(id));
+        const requestBody = {
+
+        };
+        await dispatch(courseAPI.signUpForCourse(id, requestBody));
         dispatch(userAPI.role());
+    }
+
+    let statusColor = '';
+    let statusText = '';
+
+    // Определение цвета текста в зависимости от статуса курса
+    switch (status) {
+        case 'Created':
+            statusColor = 'text-secondary';
+            statusText = 'Создан';
+            break;
+        case 'Started':
+            statusColor = 'text-primary';
+            statusText = 'В процессе обучения';
+            break;
+        case 'OpenForAssigning':
+            statusColor = 'text-success';
+            statusText = 'Открыт для записи';
+            break;
+        case 'Finished':
+            statusColor = 'text-danger';
+            statusText = 'Закрыт';
+            break;
+        default:
+            statusColor = 'text-secondary';
+            statusText = '?????';
     }
 
     return (
@@ -123,7 +153,7 @@ function FirstBlock() {
                     <ListGroup.Item>
                         <Row>
                             <Col><div className="fw-bold">Статус курса</div>
-                                <div>{status}</div></Col>
+                                <div className={statusColor}>{statusText}</div></Col>
                             <Col>
                                 {(isAdmin || isTeacherOfThisCourse) && (
 
@@ -132,9 +162,14 @@ function FirstBlock() {
                                     </div>
                                 )
                                 }
-                                {(status === "OpenForAssigning") && (
-                                    <div className='d-flex justify-content-end'>
+                                {(status === "OpenForAssigning" && !isTeacherOfThisCourse && !isStudentOfThisCourse) && (
+                                    <div className='d-flex justify-content-end mt-1'>
                                         <Button variant="success" onClick={() => sighUpForCourse()}>ЗАПИСАТЬСЯ НА КУРС</Button>
+                                    </div>
+                                )}
+                                {(!isAdmin && !isTeacherOfThisCourse && isStudentOfThisCourse) && (
+                                    <div className='d-flex justify-content-end mt-2' style={{ color: 'green' }}>
+                                        Вы участник данного курса
                                     </div>
                                 )}
                                 <EditStatusModal show={show} handleClose={handleClose} handleEditStatus={handleEditStatus} />

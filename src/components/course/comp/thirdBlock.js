@@ -3,11 +3,8 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Nav from 'react-bootstrap/Nav';
 import { useDispatch, useSelector } from "react-redux";
-import CreateNoteModal from './modals/createNote';
 import { useParams } from 'react-router-dom';
 import { courseAPI, userAPI } from '../../../API/api';
-import Note from './note';
-import Badge from 'react-bootstrap/Badge';
 import TeacherCard from './teacherCard';
 import AddTeacherModal from './modals/addTeacher';
 import { wait } from "@testing-library/user-event/dist/utils";
@@ -18,7 +15,8 @@ function ThirdBlock() {
     const dispatch = useDispatch();
     const { id } = useParams();
 
-    const [selectedTab, setSelectedTab] = useState('#teachers'); // Состояние для отслеживания выбранной вкладки
+    // Состояние для отслеживания выбранной вкладки
+    const [selectedTab, setSelectedTab] = useState('#teachers');
 
     const handleTabSelect = (tab) => {
         setSelectedTab(tab);
@@ -26,51 +24,32 @@ function ThirdBlock() {
 
     const teachers = useSelector(state => state.courseReducer.courseDetails.teachers);
     const students = useSelector(state => state.courseReducer.courseDetails.students);
-    // const notifications = useSelector(state => state.courseReducer.courseDetails.notifications);
-    // console.log("кол-во ув-й ", notifications.length)
+
 
     const isAdmin = useSelector(state => state.userReduser.role.isAdmin);
 
-    // const myEmail = useSelector(state => state.userReduser.profile.email);
-    // const teachersOfThisCourse = useSelector(state => state.courseReducer.courseDetails.teachers);
-    // const isTeacherOfThisCourse = teachersOfThisCourse.find((men) => men.email === myEmail);
-    // console.log("Я учитель? ", isTeacherOfThisCourse);
+    const myEmail = useSelector(state => state.userReduser.profile.email);
+    const teachersOfThisCourse = useSelector(state => state.courseReducer.courseDetails.teachers);
+    const isMainTeacherOfThisCourse = teachersOfThisCourse.find((men) => (men.email === myEmail && men.isMain));
 
-    // //для модального окна создания уведомления
-    // const [show, setShow] = useState(false);
-    // const handleClose = () => setShow(false);
-    // const handleShow = () => setShow(true);
-    // const handleCreateNote = (isImportant) => {
-    //     //
-    //     const note = document.getElementById('createNote1').value;
-    //     //const isImportant = document.getElementById('isImportant1').value;
-    //     //console.log("isImportant ", isImportant);
-    //     const requestBody = {
-    //         "text": note,
-    //         "isImportant": isImportant
-    //     };
-    //     dispatch(courseAPI.createNote(id, requestBody));
-    //     console.log("note ", note);
-    //     setShow(false);
-    // };
+
     //для модального окна создания уведомления
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = async () => {
         setShow(true);
-        await dispatch(userAPI.teachers());; // Вызываем функцию при открытии модального окна
+        // Вызываем функцию при открытии модального окна
+        await dispatch(userAPI.teachers());;
     };
     const handleAddTeacher = async () => {
-        //
+
         const userId = document.getElementById('mainTeacherId3').value;
-        // //const isImportant = document.getElementById('isImportant1').value;
-        //console.log("userId ", userId);
+
         const requestBody = {
             "userId": userId
         };
-        await dispatch(courseAPI.addTeacher(id, requestBody));
-        dispatch(courseAPI.courseDetails(id));
-        // console.log("note ", note);
+        dispatch(courseAPI.addTeacher(id, requestBody));
+
         setShow(false);
     };
     const users = useSelector(state => state.userReduser.allUsers);
@@ -99,21 +78,13 @@ function ThirdBlock() {
                                 Студенты
                             </Nav.Link>
                         </Nav.Item>
-                        {/* <Nav.Item>
-                            <Nav.Link
-                                href="#notifications"
-                                style={{ color: 'black', fontWeight: selectedTab === '#notifications' ? 'bold' : 'normal' }}
-                                onClick={() => handleTabSelect('#notifications')}
-                            >
-                                Уведомления <Badge pill bg="danger">{notifications.length}</Badge>
-                            </Nav.Link>
-                        </Nav.Item> */}
+
                     </Nav>
                 </Card.Header>
                 <Card.Body>
                     {selectedTab === '#teachers' && (
                         <Card.Text>
-                            {(isAdmin) && (
+                            {(isAdmin || isMainTeacherOfThisCourse) && (
                                 <div>
                                     <Button variant="primary" onClick={handleShow}>ДОБАВИТЬ ПРЕПОДАВАТЕЛЯ</Button>
                                 </div>
@@ -131,19 +102,7 @@ function ThirdBlock() {
                             ))}
                         </Card.Text>
                     )}
-                    {/* {selectedTab === '#notifications' && (
-                        <Card.Text>
-                            {(isAdmin || isTeacherOfThisCourse) && (
-                                <div>
-                                    <Button variant="primary" onClick={handleShow}>СОЗДАТЬ УВЕДОМЛЕНИЕ</Button>
-                                </div>
-                            )}
-                            <CreateNoteModal show={show} handleClose={handleClose} handleCreateNote={handleCreateNote} />
-                            {notifications.map((notification, index) => (
-                                <Note key={index} text={notification.text} isImportant={notification.isImportant} />
-                            ))}
-                        </Card.Text>
-                    )} */}
+
                 </Card.Body>
             </Card>
         </div >

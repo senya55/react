@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; // импортируйте стили Quill
+import "react-quill/dist/quill.snow.css";
 
-const MyWysiwygEditor = ({ onContentChange }) => {
-    const [content, setContent] = useState("");
+const MyWysiwygEditor = ({ onContentChange, cont }) => {
+    const [content, setContent] = useState(cont);
 
+    //onContentChange(cont);
     const handleContentChange = (newContent) => {
         setContent(newContent);
-        onContentChange(newContent); // Вызываем функцию обратного вызова при изменении содержимого
+        // Вызываем функцию обратного вызова при изменении содержимого
+        onContentChange(newContent);
     };
 
     return (
+
         <ReactQuill
             value={content}
             onChange={handleContentChange}
@@ -23,6 +26,8 @@ const MyWysiwygEditor = ({ onContentChange }) => {
                     [{ size: ["small", false, "large", "huge"] }], // Размер текста
                     [{ color: [] }], // Цвет текста
                     ["clean"],
+                    ["image"],
+                    ["video"],
                 ],
             }}
         />

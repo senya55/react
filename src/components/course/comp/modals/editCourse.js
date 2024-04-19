@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
@@ -8,25 +8,28 @@ import MyWysiwygEditor from '../../../myWysiwygEditor';
 function EditCourseModal({ showEditCourse, handleCloseEditCourse, handleEditCourse, teachers }) {
     const isAdmin = useSelector(state => state.userReduser.role.isAdmin);
     const { name, startYear, maximumStudentsCount, semester, requirements, annotations, mainTeacherId } = useSelector(state => state.courseReducer.courseDetails);
+
     //для требований
-    const [editorRequirements, setEditorRequirements] = useState('');
+    const [editorRequirements, setEditorRequirements] = useState(requirements);
 
     const handleRequirementsChange = (newRequirements) => {
         setEditorRequirements(newRequirements);
     };
 
     //для аннотаций
-    const [editorAnnotations, setEditorAnnotations] = useState('');
+    const [editorAnnotations, setEditorAnnotations] = useState(annotations);
 
     const handleAnnotationsChange = (newAnnotations) => {
         setEditorAnnotations(newAnnotations);
     };
 
 
-    const [selectedSemester, setSelectedSemester] = useState(semester); // Состояние для хранения выбранного статуса 
+    // Состояние для хранения выбранного статуса 
+    const [selectedSemester, setSelectedSemester] = useState(semester);
 
     const handleRadioChange = (e) => {
-        setSelectedSemester(e.target.value); // Обновляем состояние при изменении выбора
+        // Обновляем состояние при изменении выбора
+        setSelectedSemester(e.target.value);
     };
     return (
         <Modal size="lg" show={showEditCourse} onHide={handleCloseEditCourse}>
@@ -87,21 +90,13 @@ function EditCourseModal({ showEditCourse, handleCloseEditCourse, handleEditCour
                     )}
                     <Form.Group className="mb-3" controlId="requirements2">
                         <Form.Label>Требования</Form.Label>
-                        <MyWysiwygEditor onContentChange={handleRequirementsChange} />
+                        <MyWysiwygEditor onContentChange={handleRequirementsChange} cont={requirements} />
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="annotations2">
                         <Form.Label>Аннотации</Form.Label>
-                        <MyWysiwygEditor onContentChange={handleAnnotationsChange} />
+                        <MyWysiwygEditor onContentChange={handleAnnotationsChange} cont={annotations} />
                     </Form.Group>
-                    {(isAdmin) && (
-                        <Form.Group className="mb-3" controlId="mainTeacherId2">
-                            <Form.Label>Основной преподаватель курса</Form.Label>
-                            <Form.Select aria-label="Default select example" value={mainTeacherId}>
-                                {teachers.map((teacher, index) => (
-                                    <option key={index} value={teacher.id}>{teacher.fullName}</option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>)}
+
                 </Form>
             </Modal.Body>
             <Modal.Footer>

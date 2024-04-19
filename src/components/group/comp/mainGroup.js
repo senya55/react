@@ -7,6 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import CreateGroupModal from './createGroup';
 
+
 function MainGroup() {
 
     const dispatch = useDispatch();
@@ -30,6 +31,7 @@ function MainGroup() {
             "name": nameOfCreateGroup
         };
         dispatch(groupAPI.createGroup(requestBody));
+
         setShow(false);
     };
 

@@ -3,10 +3,19 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { useDispatch } from "react-redux";
 import { wait } from "@testing-library/user-event/dist/utils";
-import { userAPI } from "../../../API/api";
+import { userAPI } from "../../API/api";
+import swal from 'sweetalert';
+import { loginActionCreator } from "../../reducers/user-reducer";
+import { useNavigate } from "react-router-dom";
+import BirthDateForm from "./comp/birthDateForm";
+import EmailForm from "./comp/emailForm";
+import NameForm from "./comp/nameForm";
+import PasswordForm from "./comp/passwordForm";
 
 function MainRegistr() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -27,23 +36,30 @@ function MainRegistr() {
         //проверка для имени(на пустое поле)
         if (name === null || name === "") {
             document.getElementById("nameHelp1").hidden = false;
-            //console.log("000000  ", document.getElementById("nameInput1"))
-            //document.getElementById("nameInput1").classList.add("is-invalid");
-            //return;
+            return;
         }
 
         else {
             document.getElementById("nameHelp1").hidden = true;
-            //document.getElementById("nameInput1").classList.remove("is-invalid");
         }
 
         //проверка для дня рождения(на пустое поле)
-        if (birthDate === null || birthDate === "") {
+        if (birthDate === null || birthDate === "" || birthDate < "1900-01-01") {
             document.getElementById("birthDateHelp1").hidden = false;
+            return;
         }
 
         else {
             document.getElementById("birthDateHelp1").hidden = true;
+            console.log("EEEEEErimeevo ", birthDate);
+        }
+
+        const today = new Date();
+        const formattedToday = today.toISOString().slice(0, 10);
+
+        if (birthDate > formattedToday) {
+            swal("Дата рождения не может быть в будущем");
+            return;
         }
 
         //проверка для email
@@ -59,7 +75,7 @@ function MainRegistr() {
         }
 
         //проверка для пароля
-        if (password === null || password === "" || password.length < 6) {
+        if (password === null || password === "" || password.length < 6 || password.length > 32) {
             document.getElementById("passwordHelp1").hidden = false;
             return;
         }
@@ -75,7 +91,22 @@ function MainRegistr() {
         else {
             document.getElementById("confirmPasswordHelp1").hidden = true;
         }
-        await dispatch(userAPI.registr(requestBody));
+
+        if (confirmPassword != password) {
+            swal("Неверное подтверждение пароля");
+            return;
+        }
+
+        try {
+            const data = await dispatch(userAPI.registr(requestBody));
+            localStorage.setItem("token", data.token);
+            dispatch(loginActionCreator());
+            navigate("/groups");
+        } catch (error) {
+            console.log(error);
+        }
+
+
         dispatch(userAPI.profile());
         console.log("Получение роли");
         dispatch(userAPI.role());
@@ -87,46 +118,12 @@ function MainRegistr() {
         <div className="container text-start mt-4">
             <h1>Регистрация нового пользователя</h1>
             <Form onSubmit={handleSubmit} className="mt-3">
-                <Form.Group className="mb-3" controlId="fullName1">
-                    <Form.Label>ФИО</Form.Label>
-                    <Form.Control controlId="nameInput1" className="rrr" />
-                    <Form.Text hidden className="text-danger" id="nameHelp1">
-                        Введите ФИО
-                    </Form.Text>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="birthDate1">
-                    <Form.Label>День рождения</Form.Label>
-                    <Form.Control
-                        type="date"
-                    />
-                    <Form.Text hidden className="text-danger" id="birthDateHelp1">
-                        Укажите дату рождения
-                    </Form.Text>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="email1">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control type="email" />
-                    <Form.Text className="text-muted" id="emailHelpBlock1">
-                        Email будет использоваться для входа в систему
-                    </Form.Text>
-                    <Form.Text hidden className="text-danger" id="emailHelp1">
-                        Введите корректный Email
-                    </Form.Text>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="password1">
-                    <Form.Label>Пароль</Form.Label>
-                    <Form.Control type="password" />
-                    <Form.Text hidden className="text-danger" id="passwordHelp1">
-                        Пароль должен быть не менее 6 символов
-                    </Form.Text>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="confirmPassword1">
-                    <Form.Label>Повторите пароль</Form.Label>
-                    <Form.Control type="password" />
-                    <Form.Text hidden className="text-danger" id="confirmPasswordHelp1">
-                        Пароль должен быть не менее 6 символов
-                    </Form.Text>
-                </Form.Group>
+                <NameForm />
+                <BirthDateForm />
+                <EmailForm />
+                <PasswordForm lable={"Пароль"} idForm={"password1"} idFormHelp={"passwordHelp1"} />
+                <PasswordForm lable={"Повторите пароль"} idForm={"confirmPassword1"} idFormHelp={"confirmPasswordHelp1"} />
+
                 <Button variant="primary" type="submit">
                     Зарегистрироваться
                 </Button>

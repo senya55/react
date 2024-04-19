@@ -3,24 +3,30 @@ import { Link } from 'react-router-dom';
 import Nav from 'react-bootstrap/Nav';
 
 const CourseCard = ({ course }) => {
-    let statusColor = ''; // Переменная для хранения цвета текста в зависимости от статуса курса
+    let statusColor = '';
+    let statusText = '';
 
     // Определение цвета текста в зависимости от статуса курса
     switch (course.status) {
         case 'Created':
-            statusColor = 'text-secondary'; // Серый цвет
+            statusColor = 'text-secondary';
+            statusText = 'Создан';
             break;
         case 'Started':
-            statusColor = 'text-primary'; // Синий цвет
+            statusColor = 'text-primary';
+            statusText = 'В процессе обучения';
             break;
         case 'OpenForAssigning':
-            statusColor = 'text-success'; // Зеленый цвет
+            statusColor = 'text-success';
+            statusText = 'Открыт для записи';
             break;
         case 'Finished':
-            statusColor = 'text-danger'; // Красный цвет
+            statusColor = 'text-danger';
+            statusText = 'Закрыт';
             break;
         default:
-            statusColor = 'text-secondary'; // По умолчанию серый цвет
+            statusColor = 'text-secondary';
+            statusText = '?????';
     }
     const id = course.id;
     return (
@@ -34,7 +40,7 @@ const CourseCard = ({ course }) => {
                 <div className="text-secondary">Мест свободно - {course.remainingSlotsCount}</div>
             </div>
             <div className={statusColor}>
-                {course.status}
+                {statusText}
             </div>
         </Nav.Link >
     );

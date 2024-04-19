@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useDispatch, useSelector } from "react-redux";
-import { userAPI } from "../../../API/api";
+import { userAPI } from "../../API/api";
 
 function MainProfile() {
     const dispatch = useDispatch();

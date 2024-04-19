@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useDispatch } from "react-redux";
 import { userAPI } from '../../API/api';
+import { loginActionCreator } from '../../reducers/user-reducer';
 
 
 const MainHeader = () => {
@@ -17,17 +18,23 @@ const MainHeader = () => {
     console.log(profileState);
     const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     console.log("Получение роли");
-    //     dispatch(userAPI.role());
-    // })
+    //При перезагрузке строаницы стэйт обновлялся, поэтому все данные слетали. Так что я сделала такую штуку
+    //При загрузке компонента мы смотрим, есть ли токен в локалсторэдж и т д
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            dispatch(loginActionCreator());
+            dispatch(userAPI.profile());
+            dispatch(userAPI.role());
+        }
+    }, []); // [] указывает, что useEffect будет запущен только при первой загрузке компонента
 
     return (
-        <Navbar bg="secondary" data-bs-theme="dark">
+        <Navbar bg="secondary" data-bs-theme="dark" sticky="top">
             <div className='w-100'>
-                <Navbar expand="lg" className="bg-secondary">
+                <Navbar expand="lg" className="bg-secondary" >
                     <Container fluid>
-                        <Navbar.Brand href="#home">Кампусные курсы</Navbar.Brand>
+                        <Navbar.Brand href="#home">✿ Кампусные курсы</Navbar.Brand>
                         <Navbar.Toggle aria-controls="basic-navbar-nav" />
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="me-auto">

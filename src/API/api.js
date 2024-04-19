@@ -1,8 +1,10 @@
-import { courseDetailsActionCreator, createNoteActionCreator, editStatusActionCreator, myCourseActionCreator, teachingCourseActionCreator } from "../reducers/course-reducer";
-import { listOfGroupCoursesActionCreator, listOfGroupsActionCreator } from "../reducers/group-reducer";
+import { courseDetailsActionCreator, createNoteActionCreator, editStatusActionCreator, myCourseActionCreator, signUpForCourseActionCreator, teachingCourseActionCreator } from "../reducers/course-reducer";
+import { createCourseActionCreator, listOfGroupCoursesActionCreator, listOfGroupsActionCreator } from "../reducers/group-reducer";
 import { loginActionCreator, logoutActionCreator, profileActionCreator, roleActionCreator, teachersActionCreator } from "../reducers/user-reducer";
+import swal from 'sweetalert';
 
 const login = (body) => {
+
     return dispatch => fetch('https://camp-courses.api.kreosoft.space/login', {
         method: "POST",
         headers: {
@@ -11,13 +13,14 @@ const login = (body) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
+            swal({
+                text: "Неправильный логин или пароль",
+                timer: 1500
+            });
             throw new Error('Не удалось войти')
         }
         return response.json();
-    }).then(data => {
-        localStorage.setItem("token", data.token);
-        dispatch(loginActionCreator());
-    }).catch(error => console.log(error))
+    });
 }
 
 const registr = (body) => {
@@ -29,13 +32,23 @@ const registr = (body) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
+            if (response.status === 409) {
+                swal("Данный email уже занят ⛔");
+            }
+            else {
+                swal({
+                    text: "Не удалось зарегистрироваться",
+                    timer: 3000
+                });
+            }
             throw new Error('Не удалось зарегистрироваться')
         }
         return response.json();
-    }).then(data => {
-        localStorage.setItem("token", data.token);
-        dispatch(loginActionCreator());
-    }).catch(error => console.log(error))
+    });
+    // .then(data => {
+    //     localStorage.setItem("token", data.token);
+    //     dispatch(loginActionCreator());
+    // }).catch(error => console.log(error))
 }
 
 const profile = () => {
@@ -47,6 +60,9 @@ const profile = () => {
         }
     }).then(response => {
         if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+            }
             throw new Error('Не удалось получить профиль')
         }
         return response.json();
@@ -166,11 +182,19 @@ const createGroup = (body) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
+            swal({
+                text: "Не удалось создать группу :(",
+                timer: 3000
+            });
             throw new Error('Не удалось создать группу')
         }
         return response.json();
     }).then(data => {
         console.log("успешный запрос на создание группы");
+        swal({
+            text: "Группа успешно создана!!! 💖",
+            timer: 1500
+        });
         //dispatch(loginActionCreator());
     }).catch(error => console.log(error))
 }
@@ -185,11 +209,19 @@ const editGroup = (body, id) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
+            swal({
+                text: "Не удалось редактировать группу 🥺",
+                timer: 3000
+            });
             throw new Error('Не удалось редактировать группу')
         }
         return response.json();
     }).then(data => {
         console.log("успешный запрос на редактирование группы");
+        swal({
+            text: "Группа успешно отредактированна!!! (❀❛ ֊ ❛„)♡",
+            timer: 1500
+        });
         //dispatch(loginActionCreator());
     }).catch(error => console.log(error))
 }
@@ -304,6 +336,10 @@ const editStatus = (body, id) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
+            swal({
+                text: "Не удалось изменить статус ( ｡ • ᴖ • ｡)",
+                timer: 1000
+            });
             throw new Error('Не удалось поменять статус')
         }
         return response.json();
@@ -323,12 +359,20 @@ const signUpForCourse = (id, body) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
+            swal({
+                text: "Вероятно вы уже отправили заявку на этот курс •ᴗ•",
+                timer: 3000
+            });
             throw new Error('Не удалось подписаться на курс')
         }
-        return response.json();
+        //return response.json();
     }).then(data => {
         console.log("успешно подписались на курс");
-        //dispatch(editStatusActionCreator(body.status));
+        swal({
+            text: "Заявка отправлена 🎉🎉🎉",
+            timer: 1500
+        });
+        dispatch(signUpForCourseActionCreator());
     }).catch(error => console.log(error))
 }
 
@@ -342,12 +386,20 @@ const createCourse = (id, body) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
-            throw new Error('Не удалось создать курс')
+            swal({
+                text: "Не удалось создать курс <(ꐦㅍ _ㅍ)>",
+                timer: 3000
+            });
+            throw new Error('Не удалось создать курс');
         }
         return response.json();
     }).then(data => {
         console.log("успешно создан курс");
-        //dispatch(editStatusActionCreator(body.status));
+        swal({
+            text: "Курс успешно создан (ෆ˙ᵕ˙ෆ)♡",
+            timer: 1500
+        });
+        dispatch(listOfGroupCoursesActionCreator(data));
     }).catch(error => console.log(error))
 }
 
@@ -361,12 +413,20 @@ const editCourse = (id, body) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
+            swal({
+                text: "Не удалось редактировать курс (·•᷄∩•᷅ )",
+                timer: 3000
+            });
             throw new Error('Не удалось редактировать курс')
         }
         return response.json();
     }).then(data => {
         console.log("успешно редактирован курс");
-        //dispatch(editStatusActionCreator(body.status));
+        swal({
+            text: "Курс успешно редактирован ♡",
+            timer: 1000
+        });
+        dispatch(courseDetailsActionCreator(data));
     }).catch(error => console.log(error))
 }
 
@@ -380,12 +440,20 @@ const editRequirementsAndAnnotations = (id, body) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
+            swal({
+                text: "Не удалось редактировать курс (·•᷄∩•᷅ )",
+                timer: 3000
+            });
             throw new Error('Не удалось редактировать курс(требования  аннотацию)')
         }
         return response.json();
     }).then(data => {
         console.log("успешно редактирован курс(требования и аннотация)");
-        //dispatch(editStatusActionCreator(body.status));
+        swal({
+            text: "Успешно 🥳",
+            timer: 1000
+        });
+        dispatch(courseDetailsActionCreator(data));
     }).catch(error => console.log(error))
 }
 
@@ -418,12 +486,16 @@ const addTeacher = (id, body) => {
         body: JSON.stringify(body)
     }).then(response => {
         if (!response.ok) {
+            swal({
+                text: "Не удалось добавить учителя :(",
+                timer: 3000
+            });
             throw new Error('Не удалось добавить учителя')
         }
         return response.json();
     }).then(data => {
         console.log("успешно добавлен учитель");
-        //dispatch(createNoteActionCreator(body));
+        dispatch(courseDetailsActionCreator(data));
     }).catch(error => console.log(error))
 }
 
@@ -465,6 +537,29 @@ const editMark = (id, studentId, body) => {
     }).catch(error => console.log(error))
 }
 
+const deleteCourse = (id) => {
+    return dispatch => fetch(`https://camp-courses.api.kreosoft.space/courses/${id}`, {
+        method: "DELETE",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Не удалось удалить курс')
+        }
+        return response.json();
+    });
+    // .then(data => {
+    //     console.log("успешный запрос на удаление курса");
+    //     swal({
+    //         text: "Курс удален (˚ ˃̣̣̥⌓˂̣̣̥ )づ♡",
+    //         timer: 3000
+    //     });
+
+    // }).catch(error => console.log(error))
+}
+
 export const courseAPI = {
     listOfMyCourses: listOfMyCourses,
     listOfTeachingCourses: listOfTeachingCourses,
@@ -477,6 +572,6 @@ export const courseAPI = {
     createNote: createNote,
     addTeacher: addTeacher,
     editStudentStatus: editStudentStatus,
-    editMark: editMark
+    editMark: editMark,
+    deleteCourse: deleteCourse
 }
-

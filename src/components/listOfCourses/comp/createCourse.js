@@ -27,6 +27,10 @@ function CreateCourseModal({ show, handleClose, saveCourse, teachers }) {
     const handleRadioChange = (e) => {
         setSelectedSemester(e.target.value); // Обновляем состояние при изменении выбора
     };
+
+
+
+
     return (
         <Modal show={show} onHide={handleClose} size="lg">
             <Modal.Header closeButton>
@@ -39,18 +43,27 @@ function CreateCourseModal({ show, handleClose, saveCourse, teachers }) {
                         <Form.Control
                             type="text"
                         />
+                        <Form.Text hidden className="text-danger" id="courseNameHelp1">
+                            Введите название курса
+                        </Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="startYear1">
                         <Form.Label>Год начала курса</Form.Label>
                         <Form.Control
                             type="number"
                         />
+                        <Form.Text hidden className="text-danger" id="startYearHelp1">
+                            Укажите корректную дату(2000-2029год)
+                        </Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="maximumStudentsCount1">
                         <Form.Label>Общее количество мест</Form.Label>
                         <Form.Control
                             type="number"
                         />
+                        <Form.Text hidden className="text-danger" id="maximumStudentsCountHelp1">
+                            Укажите кол-во мест(1-200)
+                        </Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="semester1">
                         <Form.Label>Семестр</Form.Label>
@@ -74,15 +87,20 @@ function CreateCourseModal({ show, handleClose, saveCourse, teachers }) {
                                 onChange={handleRadioChange} // Обработчик изменения выбора
                             />
                         </div>
+                        <Form.Text hidden className="text-danger" id="semesterHelp1">
+                            Выберите семестр
+                        </Form.Text>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="requirements1">
                         <Form.Label>Требования</Form.Label>
                         <MyWysiwygEditor onContentChange={handleRequirementsChange} />
+                        <small hidden style={{ color: 'red' }} id="requirementsHelp1" >Напишите что-нибудь пж</small>
                         {/* <p>{editorContent}</p> */}
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="annotations1">
                         <Form.Label>Аннотации</Form.Label>
                         <MyWysiwygEditor onContentChange={handleAnnotationsChange} />
+                        <small hidden style={{ color: 'red' }} id="annotationsHelp1" >Напишите что-нибудь пж</small>
                     </Form.Group>
                     <Form.Group className="mb-3" controlId="mainTeacherId1">
                         <Form.Label>Основной преподаватель курса</Form.Label>

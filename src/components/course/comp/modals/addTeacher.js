@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
-import FloatingLabel from 'react-bootstrap/FloatingLabel';
-import { useDispatch, useSelector } from "react-redux";
+
 
 function AddTeacherModal({ show, handleClose, handleAddTeacher, users }) {
-
-    //const users = useSelector(state => state.userReducer.allUsers);
 
     return (
         <Modal size="lg" show={show} onHide={handleClose}>

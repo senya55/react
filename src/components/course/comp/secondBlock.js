@@ -13,7 +13,8 @@ function SecondBlock() {
     const dispatch = useDispatch();
     const { id } = useParams();
 
-    const [selectedTab, setSelectedTab] = useState('#requirements'); // Состояние для отслеживания выбранной вкладки
+    // Состояние для отслеживания выбранной вкладки
+    const [selectedTab, setSelectedTab] = useState('#requirements');
 
     const handleTabSelect = (tab) => {
         setSelectedTab(tab);
@@ -36,10 +37,9 @@ function SecondBlock() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const handleCreateNote = (isImportant) => {
-        //
+
         const note = document.getElementById('createNote1').value;
-        //const isImportant = document.getElementById('isImportant1').value;
-        //console.log("isImportant ", isImportant);
+
         const requestBody = {
             "text": note,
             "isImportant": isImportant

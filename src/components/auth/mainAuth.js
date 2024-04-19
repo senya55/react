@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { useDispatch } from "react-redux";
 import { wait } from "@testing-library/user-event/dist/utils";
-import { userAPI } from "../../../API/api";
-
+import { userAPI } from "../../API/api";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginActionCreator } from '../../reducers/user-reducer';
 
 function MainAuth() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const handleSubmit = async (event) => {
         //предотвращает стандартное поведение отправки формы,
         //чтобы страница не перезагружалась при отправке
@@ -20,6 +22,7 @@ function MainAuth() {
             "email": email,
             "password": password
         };
+
 
         //проверка для email
         if (email === null || email === "" || /\w+\@\w+\.\w+/.test(email) == false) {
@@ -38,12 +41,22 @@ function MainAuth() {
         else {
             document.getElementById("passwordHelp2").hidden = true;
         }
-        await dispatch(userAPI.login(requestBody));
+
+        try {
+            const data = await dispatch(userAPI.login(requestBody));
+            localStorage.setItem("token", data.token);
+            dispatch(loginActionCreator());
+            navigate("/groups");
+        } catch (error) {
+            console.log(error);
+        }
+
         dispatch(userAPI.profile());
         console.log("Получение роли");
         dispatch(userAPI.role());
 
     };
+
 
     return (
         <div className="container text-start mt-4">

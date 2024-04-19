@@ -4,10 +4,12 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 
 function EditStatusModal({ show, handleClose, handleEditStatus }) {
-    const [selectedStatus, setSelectedStatus] = useState(""); // Состояние для хранения выбранного статуса 
+    // Состояние для хранения выбранного статуса 
+    const [selectedStatus, setSelectedStatus] = useState("");
 
+    // Обновляем состояние при изменении выбора
     const handleRadioChange = (e) => {
-        setSelectedStatus(e.target.value); // Обновляем состояние при изменении выбора
+        setSelectedStatus(e.target.value);
     };
     return (
         <Modal size="lg" show={show} onHide={handleClose}>

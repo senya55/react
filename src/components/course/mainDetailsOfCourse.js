@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import Button from 'react-bootstrap/Button';
 import { useDispatch, useSelector } from "react-redux";
-//import { courseAPI } from "../../API/api";
 import { useParams } from 'react-router-dom';
 import { courseAPI } from '../../API/api';
 import FirstBlock from './comp/firstBlock';
 import SecondBlock from './comp/secondBlock';
 import ThirdBlock from './comp/thirdBlock';
+import DeleteButtonBlock from './comp/deleteButton';
 
 function MainDetailsOfCourse() {
 
@@ -24,6 +23,7 @@ function MainDetailsOfCourse() {
             <FirstBlock />
             <SecondBlock />
             <ThirdBlock />
+            <DeleteButtonBlock />
 
         </div>
     );
